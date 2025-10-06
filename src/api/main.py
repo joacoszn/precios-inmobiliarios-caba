@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from .routers import propiedades, predictions  # Importamos el nuevo router
+from .routers import propiedades, predictions
 
 app = FastAPI(
     title="API de Análisis Inmobiliario CABA",
@@ -7,7 +7,7 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Incluir los routers en la aplicación
+# routers para la aplicación
 app.include_router(propiedades.router, prefix="/propiedades", tags=["Propiedades"])
 app.include_router(
     predictions.router, 
