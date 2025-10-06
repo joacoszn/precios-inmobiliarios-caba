@@ -1,0 +1,13 @@
+pandas
+mysql-connector-python
+fastapi
+uvicorn[standard]
+pydantic
+python-dotenv
+
+# Dependencias para Machine Learning y Análisis
+scikit-learn
+jupyter
+matplotlib
+seaborn
+SQLAlchemy
