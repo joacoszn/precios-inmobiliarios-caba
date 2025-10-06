@@ -85,7 +85,8 @@ curl -X POST "http://127.0.0.1:8000/predict/" \
     "dormitorios": 3,
     "banos": 2,
     "superficie_total_m2": 120,
-    "cocheras": 1
+    "cocheras": 1,
+    "description": "Espectacular piso en Recoleta, muy luminoso y con balcón."
   }' | jq
 ```
 
@@ -139,7 +140,8 @@ curl -X POST "http://127.0.0.1:8000/predict/" \
     "dormitorios": 2,
     "banos": 2,
     "superficie_total_m2": 85,
-    "cocheras": 1
+    "cocheras": 1,
+    "description": "Departamento con excelente distribución y amenities. Pileta y SUM."
   }' | jq
 ```
 
@@ -208,7 +210,8 @@ for barrio in Palermo Recoleta Belgrano Caballito; do
       \"dormitorios\": 2,
       \"banos\": 2,
       \"superficie_total_m2\": 80,
-      \"cocheras\": 1
+      \"cocheras\": 1,
+      \"description\": \"Departamento estándar, luminoso y con balcón."
     }" | jq '.predicted_price_usd'
 done
 ```
@@ -280,8 +283,8 @@ import requests
 import json
 import pandas as pd
 
-def analisis_completo_propiedad(barrio, ambientes, dormitorios, banos, superficie, cocheras):
-    """Análisis completo de una propiedad"""
+def analisis_completo_propiedad(barrio, ambientes, dormitorios, banos, superficie, cocheras, description=""):
+    """Análisis completo de una propiedad, incluyendo descripción."""
     
     # 1. Predicción del modelo
     prediction_data = {
@@ -290,7 +293,8 @@ def analisis_completo_propiedad(barrio, ambientes, dormitorios, banos, superfici
         "dormitorios": dormitorios,
         "banos": banos,
         "superficie_total_m2": superficie,
-        "cocheras": cocheras
+        "cocheras": cocheras,
+        "description": description
     }
     
     response = requests.post("http://127.0.0.1:8000/predict/", json=prediction_data)
@@ -330,7 +334,7 @@ def generar_recomendacion(prediction, barrio_stats):
 
 # Ejemplo de uso
 if __name__ == "__main__":
-    resultado = analisis_completo_propiedad("Palermo", 3, 2, 2, 80, 1)
+    resultado = analisis_completo_propiedad("Palermo", 3, 2, 2, 80, 1, "Balcón con parrilla, muy luminoso.")
     print(json.dumps(resultado, indent=2, ensure_ascii=False))
 ```
 

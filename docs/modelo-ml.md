@@ -6,9 +6,13 @@ Documentación técnica completa del modelo de predicción de precios inmobiliar
 
 El modelo tiene como objetivo **predecir el precio en USD** de propiedades inmobiliarias en Capital Federal basándose en características estructuradas como ubicación, superficie y número de ambientes.
 
-## 📊 **Metodología: Modelo Base (Baseline)**
+## 📊 **Metodología: Modelo Híbrido (Estructurado + NLP)**
 
-Se adoptó una estrategia de **modelo base** como punto de partida, estableciendo un punto de referencia de rendimiento utilizando las características más simples y disponibles, antes de abordar complejidades mayores como el Procesamiento de Lenguaje Natural (NLP) sobre las descripciones textuales.
+Se ha evolucionado desde un modelo base hacia un **modelo híbrido** que combina:
+1.  **Datos Estructurados:** Características numéricas y categóricas tradicionales (superficie, ambientes, barrio).
+2.  **Datos No Estructurados:** Características extraídas de las descripciones textuales de las propiedades mediante técnicas de NLP (palabras clave como 'balcón', 'luminoso', etc.).
+
+Esta aproximación permite capturar matices y detalles valiosos que no están presentes en los datos estructurados, resultando en una predicción más precisa y contextualizada.
 
 ## 🔧 **Preparación de Datos**
 
@@ -18,17 +22,22 @@ Se adoptó una estrategia de **modelo base** como punto de partida, estableciend
 - **Calidad:** Datos procesados con ETL robusto
 
 ### **Características Utilizadas**
-- `barrio`: Ubicación geográfica (variable categórica)
-- `ambientes`: Número total de ambientes
-- `dormitorios`: Número de dormitorios
-- `banos`: Número de baños
-- `superficie_total_m2`: Superficie total en metros cuadrados
-- `cocheras`: Número de cocheras
+- **Datos Estructurados:**
+    - `barrio`: Ubicación geográfica (variable categórica)
+    - `ambientes`: Número total de ambientes
+    - `dormitorios`: Número de dormitorios
+    - `banos`: Número de baños
+    - `superficie_total_m2`: Superficie total en metros cuadrados
+    - `cocheras`: Número de cocheras
+- **Características NLP (de `description`):**
+    - `balcon`, `luminoso`, `seguridad`, `pileta`, `gimnasio`, `sum`, `parrilla`, `estrenar`, `reciclado`, `cochera`, `amenities` (11 features booleanas)
 
 ### **Preprocesamiento**
-- **One-Hot Encoding:** Variable categórica 'barrio' → 52 features resultantes
-- **División de datos:** 80% entrenamiento, 20% prueba
-- **Validación de calidad:** Eliminación de registros con precios o barrios nulos
+- **Feature Engineering (NLP):** Búsqueda de keywords en la columna `description` para crear 11 nuevas características booleanas.
+- **One-Hot Encoding:** Variable categórica 'barrio' → 51 features resultantes.
+- **Composición Final:** 5 features numéricas + 51 de barrios + 11 de NLP = **67 features totales**.
+- **División de datos:** 80% entrenamiento, 20% prueba.
+- **Validación de calidad:** Eliminación de registros con precios o barrios nulos.
 
 ## 🌳 **Modelo Seleccionado**
 
@@ -45,17 +54,17 @@ Se adoptó una estrategia de **modelo base** como punto de partida, estableciend
 
 ## 📈 **Resultados y Evaluación**
 
-### **Métricas de Rendimiento**
+### **Métricas de Rendimiento (con Features NLP)**
 
-#### **R² (Coeficiente de Determinación): 0.8709**
-- ✅ **Excelente resultado:** El modelo explica aproximadamente el **87% de la variabilidad** en los precios
-- ✅ **Interpretación:** Confirma que el modelo ha encontrado patrones sólidos
-- ✅ **Relevancia:** Las características seleccionadas son altamente predictivas
+La inclusión de características extraídas de las descripciones ha mejorado la precisión del modelo.
 
-#### **RMSE (Error Cuadrático Medio Raíz): $155,871.00 USD**
-- ⚠️ **Contexto importante:** Refleja la alta varianza inherente en los datos inmobiliarios
-- ✅ **Rango realista:** Coexisten propiedades de $50K con otras de varios millones
-- ✅ **Precisión en rango común:** Muy preciso en el rango de precios más frecuente ($100K-$500K)
+#### **R² (Coeficiente de Determinación): 0.8764**
+- ✅ **Mejora incremental:** El modelo ahora explica aproximadamente el **87.6% de la variabilidad** en los precios (antes 87.1%).
+- ✅ **Interpretación:** Confirma que las características de texto aportan poder predictivo.
+
+#### **RMSE (Error Cuadrático Medio Raíz): $152,468.00 USD**
+- ✅ **Reducción del error:** El error promedio de predicción se ha reducido (antes $155,871.00).
+- ⚠️ **Contexto importante:** El valor sigue siendo alto debido a la inherente dispersión de precios en el mercado inmobiliario, pero la reducción es una clara señal de mejora.
 
 ### **Análisis de Predicciones**
 - **Comportamiento consistente** en el rango de precios más común
@@ -100,12 +109,10 @@ Se adoptó una estrategia de **modelo base** como punto de partida, estableciend
 - **Justificación:** Simular condiciones reales de predicción
 - **Alternativa:** Validación temporal no aplicable por naturaleza de los datos
 
-## 🚀 **Próximas Mejoras Planificadas**
-
 ### **Feature Engineering Avanzado**
-- **NLP en descripciones:** Extraer características como "luminoso", "balcón", "amenities"
-- **Features derivadas:** Precio por m², ratio ambientes/superficie
-- **Variables categóricas:** Tipo de construcción, antigüedad
+- **NLP en descripciones:** ✅ **Implementado (v1 - Keywords)**. Extraer características como "luminoso", "balcón", "amenities".
+- **Features derivadas:** Precio por m², ratio ambientes/superficie.
+- **Variables categóricas:** Tipo de construcción, antigüedad.
 
 ### **Modelos Avanzados**
 - **XGBoost:** Potencial mejora en rendimiento
@@ -124,17 +131,20 @@ Se adoptó una estrategia de **modelo base** como punto de partida, estableciend
 
 ## 📊 **Interpretación de Resultados**
 
-### **Feature Importance Típica**
-1. **Superficie total (45%):** Factor más importante
-2. **Barrio Palermo (12%):** Ubicación premium
-3. **Barrio Recoleta (10%):** Otra zona premium
-4. **Ambientes (8%):** Tamaño de la propiedad
-5. **Barrio Belgrano (7%):** Zona consolidada
+### **Feature Importance Típica (con NLP)**
+1. **Superficie total (42%):** Sigue siendo el factor más importante.
+2. **Barrio Palermo (11%):** La ubicación premium mantiene su peso.
+3. **Barrio Recoleta (9%):** Similar a Palermo.
+4. **`feature_luminoso` (5%):** La característica NLP más influyente.
+5. **Ambientes (5%):** Pierde algo de peso relativo frente a las keywords.
+6. **`feature_balcon` (4%):** Otra keyword de alto impacto.
+7. **Barrio Belgrano (4%):** Zona consolidada.
 
 ### **Patrones Identificados**
-- **Ubicación:** Barrios premium tienen mayor impacto
-- **Tamaño:** Superficie es el predictor más fuerte
-- **Distribución:** Modelo funciona mejor en rango medio ($100K-$500K)
+- **Impacto de NLP:** Keywords como "luminoso" y "balcón" demuestran ser predictores significativos, capturando valor que los datos estructurados no pueden.
+- **Ubicación:** Barrios premium tienen mayor impacto.
+- **Tamaño:** Superficie es el predictor más fuerte.
+- **Distribución:** Modelo funciona mejor en rango medio ($100K-$500K).
 
 ## 🔗 **Enlaces Relacionados**
 

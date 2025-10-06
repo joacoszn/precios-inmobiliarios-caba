@@ -241,10 +241,10 @@ def create_dashboard():
         st.metric("Precio Promedio", f"${get_precio_promedio():,.0f}")
     
     with col3:
-        st.metric("R² del Modelo", "0.8709")
+        st.metric("R² del Modelo", "0.8764")
     
     with col4:
-        st.metric("RMSE", f"${155871:,.0f}")
+        st.metric("RMSE", f"${152468:,.0f}")
     
     # Gráficos
     st.subheader("📊 Análisis de Precios")

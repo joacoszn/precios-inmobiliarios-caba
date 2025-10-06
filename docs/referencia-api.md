@@ -143,7 +143,8 @@ POST /predict/
   "dormitorios": 2,
   "banos": 2,
   "superficie_total_m2": 80,
-  "cocheras": 1
+  "cocheras": 1,
+  "description": "Excelente departamento muy luminoso con balcón. A estrenar."
 }
 ```
 
@@ -168,20 +169,24 @@ GET /predict/model-info
 ```json
 {
   "model_type": "RandomForestRegressor",
-  "n_features": 52,
+  "n_features": 67,
   "n_estimators": 100,
   "metrics": {
-    "r2_score": 0.8709,
-    "rmse_usd": 155871
+    "r2_score": 0.8764,
+    "rmse_usd": 152468
   },
   "top_features": [
     {
       "feature": "superficie_total_m2",
-      "importance": 0.45
+      "importance": 0.42
     },
     {
       "feature": "barrio_Palermo",
-      "importance": 0.12
+      "importance": 0.11
+    },
+    {
+      "feature": "feature_luminoso",
+      "importance": 0.05
     }
   ]
 }

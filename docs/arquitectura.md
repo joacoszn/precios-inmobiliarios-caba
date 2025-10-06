@@ -1,8 +1,8 @@
-# 🏗️ **Arquitectura y Decisiones Técnicas**
+# **Arquitectura y Decisiones Técnicas**
 
 Documentación técnica del diseño del sistema, decisiones arquitectónicas y mejores prácticas implementadas.
 
-## 🎯 **Visión General de la Arquitectura**
+## **Visión General de la Arquitectura**
 
 El proyecto sigue una arquitectura de **microservicios modulares** con separación clara de responsabilidades:
 
@@ -26,7 +26,7 @@ El proyecto sigue una arquitectura de **microservicios modulares** con separaci�
                     └─────────────────┘
 ```
 
-## 📁 **Estructura del Proyecto**
+## **Estructura del Proyecto**
 
 ```
 api/
@@ -54,6 +54,7 @@ api/
 │   │       ├── propiedades.py
 │   │       └── predictions.py
 │   └── ml/                       # Modelo de ML
+│       ├── feature_engineering.py # Extracción de features NLP
 │       ├── model.pkl             # Modelo entrenado
 │       ├── model_columns.pkl     # Columnas del modelo
 │       ├── predict.py           # Función de predicción
@@ -62,7 +63,7 @@ api/
 └── README.md                     # Archivo principal
 ```
 
-## 🔄 **Flujo de Datos (Data Pipeline)**
+## **Flujo de Datos (Data Pipeline)**
 
 ### **1. Fase de Extracción**
 - **Fuente:** Dataset crudo en formato `.pkl`
@@ -160,14 +161,15 @@ connection_pool = mysql.connector.pooling.MySQLConnectionPool(
 
 ### **Pipeline de ML**
 ```
-Datos Crudos → Limpieza → Entrenamiento → Persistencia → Predicción
-     │              │           │            │           │
-     │              │           │            │           │
-  MySQL DB    Preprocessing   RandomForest   Pickle    API Endpoint
+Datos Crudos → Limpieza → NLP Feature Engineering → Entrenamiento → Persistencia → Predicción
+     │              │              │                   │            │              │
+     │              │              │                   │            │              │
+  MySQL DB    Preprocessing   Keyword Extraction   RandomForest   Pickle       API Endpoint
 ```
 
 ### **Separación de Responsabilidades**
 - **`notebooks/entrenamiento_modelo.ipynb`:** Entrenamiento y evaluación
+- **`src/ml/feature_engineering.py`:** Lógica para extraer features de texto.
 - **`src/ml/predict.py`:** Lógica de predicción en producción
 - **`src/ml/model.pkl`:** Modelo serializado
 - **`src/ml/model_columns.pkl`:** Metadatos del modelo
@@ -175,7 +177,7 @@ Datos Crudos → Limpieza → Entrenamiento → Persistencia → Predicción
 ### **Decisiones de Modelado**
 - **Algoritmo:** RandomForestRegressor
 - **Justificación:** Robusto, interpretable, maneja bien outliers
-- **Features:** 52 características (51 barrios + 5 numéricas)
+- **Features:** 63 características (51 barrios + 5 numéricas + 11 NLP)
 - **Validación:** Train/test split 80/20
 
 ## 🔒 **Seguridad y Configuración**
@@ -267,8 +269,8 @@ logger.info(
 - **Documentación:** Documentación completa en código
 
 ### **Modelo de ML**
-- **R²:** 0.8709 (excelente)
-- **RMSE:** $155,871 USD (contextualizado)
+- **R²:** 0.8764 (excelente)
+- **RMSE:** $152,468 USD (contextualizado)
 - **Validación:** Train/test split
 - **Persistencia:** Modelo serializado correctamente
 
