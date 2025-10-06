@@ -57,6 +57,10 @@ class PredictionInput(BaseModel):
     banos: int = Field(..., ge=1, le=6)
     superficie_total_m2: int = Field(..., gt=20, lt=1000, description="Entre 20 y 1000 m²")
     cocheras: int = Field(..., ge=0, le=4)
+    # === INICIO DE LA MODIFICACIÓN ===
+    # Añadimos el campo opcional para la descripción
+    description: Optional[str] = Field(None, description="Descripción textual de la propiedad para análisis NLP")
+    # === FIN DE LA MODIFICACIÓN ===
     
     @field_validator('barrio')
     @classmethod
@@ -115,7 +119,6 @@ class ModelInfo(BaseModel):
     n_estimators: int
     metrics: dict
     top_features: List[FeatureImportance]
-
 
 
 

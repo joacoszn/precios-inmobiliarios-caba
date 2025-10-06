@@ -2,8 +2,26 @@
 from fastapi import APIRouter, HTTPException, Depends
 from ..schemas import PredictionInput, PredictionOutput, ModelInfo
 from ...ml.predict import predict_price, get_similar_properties_avg, model, model_columns
-from ..db_connection import get_db_cursor # Importamos la dependencia
+from ..db_connection import get_db_cursor
 from mysql.connector.cursor import MySQLCursorDict
+import json
+import os
+
+# --- Carga de artefactos del modelo y métricas ---
+# La ruta se construye de forma relativa y robusta
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+ML_DIR = os.path.join(BASE_DIR, '..', '..', 'ml')
+METRICS_PATH = os.path.join(ML_DIR, 'metrics.json')
+
+try:
+    with open(METRICS_PATH, 'r') as f:
+        model_metrics = json.load(f)
+    print("✅ Métricas del modelo cargadas exitosamente.")
+except FileNotFoundError:
+    print(f"❌ Error: No se encontró el archivo de métricas en {METRICS_PATH}")
+    # Definimos métricas por defecto si el archivo no existe
+    model_metrics = {"r2_score": "N/A", "rmse_usd": "N/A"}
+
 
 router = APIRouter()
 
@@ -24,7 +42,6 @@ def predict_property_price(input_data: PredictionInput, cursor: MySQLCursorDict 
         
         prediction_result = predict_price(data_dict)
         
-        # Ahora pasamos el cursor inyectado a la función
         similar_avg = get_similar_properties_avg(data_dict, cursor)
         
         return PredictionOutput(
@@ -59,9 +76,7 @@ def get_model_info():
         "model_type": type(model).__name__,
         "n_features": len(model_columns),
         "n_estimators": model.n_estimators,
-        "metrics": {
-            "r2_score": 0.8709,
-            "rmse_usd": 155871
-        },
+        "metrics": model_metrics, # Usamos las métricas cargadas del archivo
         "top_features": feature_importance
     }
+

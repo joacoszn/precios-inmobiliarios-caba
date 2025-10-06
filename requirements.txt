@@ -1,9 +1,9 @@
-pandas
-mysql-connector-python
+requirements.txt
 fastapi
 uvicorn[standard]
-pydantic
+mysql-connector-python
 python-dotenv
+pydantic
 
 # Dependencias para Machine Learning y Análisis
 scikit-learn
@@ -11,3 +11,4 @@ jupyter
 matplotlib
 seaborn
 SQLAlchemy
+nltk

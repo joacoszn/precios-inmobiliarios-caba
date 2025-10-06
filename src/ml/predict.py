@@ -9,17 +9,20 @@ from typing import Optional
 from decimal import Decimal
 from dotenv import load_dotenv
 
+# Importar nuestra nueva función de feature engineering
+from .feature_engineering import crear_features_nlp
+
 load_dotenv()
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-#Rutas a los archivos del modelo
+# Construimos las rutas a los archivos del modelo
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_PATH = os.path.join(BASE_DIR, 'model.pkl')
 COLUMNS_PATH = os.path.join(BASE_DIR, 'model_columns.pkl')
 
-# Carga de artefactos del modelo
+# --- Carga de artefactos del modelo ---
 try:
     with open(MODEL_PATH, 'rb') as f:
         model = pickle.load(f)
@@ -37,16 +40,28 @@ except FileNotFoundError:
     model_columns = None
 
 def predict_price(data: dict) -> dict:
-    """Retorna predicción + intervalo de confianza"""
+    """Retorna predicción + intervalo de confianza, ahora procesando la descripción."""
     if model is None or model_columns is None:
         raise RuntimeError("El modelo o las columnas no se han cargado correctamente.")
 
+    # Convertir el diccionario de entrada a un DataFrame
     input_df = pd.DataFrame([data])
-    input_encoded = pd.get_dummies(input_df, columns=['barrio'], dtype=int)
+    
+    # Crear las caractersticas NLP desde la descripción (si existe)
+    nlp_features_df = crear_features_nlp(input_df, 'description')
+
+    # unir las características originales con las nuevas características NLP
+    input_df_no_desc = input_df.drop(columns=['description'], errors='ignore')
+    input_enriquecido = pd.concat([input_df_no_desc, nlp_features_df], axis=1)
+
+    input_encoded = pd.get_dummies(input_enriquecido, columns=['barrio'], dtype=int)
+    
     final_df = input_encoded.reindex(columns=model_columns, fill_value=0)
     
+    # Realizar la predicción
     prediction = model.predict(final_df)[0]
     
+    # intervalo de confianza
     tree_predictions = [tree.predict(final_df)[0] for tree in model.estimators_]
     std = np.std(tree_predictions)
     
@@ -67,7 +82,7 @@ def predict_price(data: dict) -> dict:
 def get_similar_properties_avg(data: dict, cursor: MySQLCursorDict) -> Optional[float]:
     """
     Calcula el precio promedio de propiedades similares usando un cursor existente.
-    Ahora retorna Optional[float] para permitir el valor None.
+    (Esta función no requiere cambios)
     """
     try:
         query = """
@@ -96,7 +111,7 @@ def get_similar_properties_avg(data: dict, cursor: MySQLCursorDict) -> Optional[
         if isinstance(avg_price, Decimal):
             return float(avg_price)
         
-        return avg_price 
+        return avg_price
         
     except Exception as e:
         print(f"Error calculando promedio de propiedades similares: {e}")
