@@ -1,57 +1,38 @@
-# 📊 **Análisis de Datos y Visualizaciones para Inversión Inmobiliaria**
+# 📊 **Análisis de Inversión y Oportunidades de Mercado**
 
 Esta sección presenta un análisis profundo del mercado inmobiliario de CABA, utilizando visualizaciones para extraer insights accionables y demostrar el valor del dataset. El objetivo es responder preguntas clave para un inversor o analista.
 
-## 🧠 **Insights Clave y Conclusiones del Análisis**
+## 💎 **Análisis de "Joyas Ocultas": ¿Dónde está el Valor Escondido?**
 
-1.  **Zonas de Lujo Consolidadas:** **Puerto Madero, Palermo y Recoleta** dominan el mercado con el precio por metro cuadrado más alto. Son apuestas seguras pero con alta barrera de entrada.
-2.  **La Oportunidad del Valor/m²:** Barrios como **Villa Crespo, Chacarita y Colegiales** presentan un precio/m² significativamente más bajo que sus vecinos del "corredor norte", pero con una alta densidad de propiedades y potencial de crecimiento. Un inversor podría encontrar aquí oportunidades de revalorización.
-3.  **Dispersión de Precios = Oportunidad:** El análisis de distribución (box plot) muestra que **Palermo y Recoleta** tienen una enorme dispersión de precios. Esto significa que, aunque el promedio es alto, existen propiedades (outliers inferiores) con precios muy por debajo de la media del barrio, representando potenciales oportunidades de compra.
-4.  **La Superficie es Rey:** El heatmap de correlación confirma que la `superficie_total_m2` es, por lejos, la variable que más se correlaciona con el `price_usd` (0.75). A la hora de predecir, el tamaño de la propiedad es el factor más determinante.
+Un inversor inteligente no solo busca el barrio más caro, sino el que tiene mayor potencial de revalorización. Una forma de medir esto es encontrar zonas donde el precio por metro cuadrado (`precio/m²`) aún no es prohibitivo, pero la calidad de la oferta (medida por la cantidad de `amenities`) es alta.
 
----
+El siguiente gráfico cruza estas dos variables:
 
-## 🗺️ **Análisis Geográfico: ¿Dónde Invertir?**
+*   **Eje X:** Precio Promedio por m² (más a la derecha, más caro).
+*   **Eje Y:** % de Propiedades con Amenities (más arriba, mejor oferta).
+*   **Tamaño de la Burbuja:** Cantidad de propiedades en el barrio (más grande, más mercado).
 
-### **1. Precio Promedio por Metro Cuadrado: El Verdadero Indicador de Valor**
+![Análisis de Joyas Ocultas](./images/joyas_ocultas.png)
 
-El precio absoluto de una propiedad puede ser engañoso. Al normalizar por metro cuadrado, podemos comparar el "valor" real de diferentes zonas. Este gráfico revela los barrios más cotizados de la ciudad.
+### **Interpretación y Conclusiones de Inversión:**
 
-![Precio por m² por Barrio](./images/precio_m2_por_barrio.png)
+1.  **Lujo Consolidado (Cuadrante Superior Derecho):** **Puerto Madero, Palermo y Recoleta** son los líderes indiscutibles. Tienen el precio/m² más alto y una gran oferta de amenities. Son inversiones seguras y de prestigio, pero con una barrera de entrada muy alta y, posiblemente, menor margen de crecimiento porcentual.
 
-**Interpretación:** Puerto Madero se dispara como el barrio más caro, casi duplicando el valor de otros barrios premium como Palermo y Recoleta. Este es un mercado de nicho, ultra-lujo. La verdadera batalla por el segundo puesto está entre Palermo, Belgrano y Recoleta, todos con valores muy similares, consolidando el "corredor norte" como la zona más valiosa de la ciudad.
+2.  **Las "Joyas Ocultas" (Cuadrante Superior Izquierdo):** Aquí es donde encontramos el valor. Barrios como **Villa Crespo, Chacarita y Colegiales** tienen un porcentaje de amenities comparable al de zonas más caras, pero su precio/m² es significativamente más bajo. 
+    *   **Insight Clave:** Estos barrios están en pleno proceso de "palermización" y gentrificación. Comprar aquí podría significar una alta revalorización a mediano plazo a medida que sus precios convergen con los de sus vecinos más cotizados.
 
-### **2. Distribución de Precios: Entendiendo la Dispersión del Mercado**
+3.  **Mercados Tradicionales (Cuadrante Inferior Izquierdo):** Zonas como **Almagro, Caballito o Villa Urquiza** representan un mercado más tradicional. Tienen una gran cantidad de propiedades (burbujas grandes) y precios por m² más accesibles, pero una menor proporción de edificios con amenities modernos. Son ideales para una inversión conservadora o para compradores finales que buscan una buena relación precio/ubicación sin tanto lujo.
 
-Un promedio no revela la historia completa. Este gráfico de box plot nos muestra el rango de precios (la "caja" contiene el 50% central de los datos), la mediana (la línea dentro de la caja) y los valores atípicos en los barrios más importantes.
-
-![Distribución de Precios por Barrio](./images/distribucion_precios_barrios.png)
-
-**Interpretación:** Mientras que barrios como **Caballito y Villa Urquiza** tienen un mercado más compacto y homogéneo (cajas más pequeñas), **Palermo y Recoleta** muestran una dispersión de precios gigantesca. Esto es clave para un inversor: significa que en estos barrios premium coexisten propiedades estándar con penthouses de lujo, y es más probable encontrar propiedades "fuera de precio" (tanto por encima como por debajo de la media) que pueden ser negociadas.
+4.  **Zonas Emergentes (Cerca del Origen):** Barrios con bajo precio/m² y baja oferta de amenities. Podrían ser apuestas a muy largo plazo, pero con mayor riesgo.
 
 ---
 
-## ⚙️ **Análisis de Características: ¿Qué Impacta en el Precio?**
+## 🚀 **Cómo Generar este Análisis**
 
-### **3. Correlación entre Variables Numéricas**
-
-Este mapa de calor (heatmap) nos muestra qué tan fuerte es la relación lineal entre las diferentes características numéricas de una propiedad. Un valor cercano a 1 (rojo) significa una fuerte correlación positiva, mientras que un valor cercano a -1 (azul) indica una fuerte correlación negativa.
-
-![Heatmap de Correlación](./images/correlacion_heatmap.png)
-
-**Interpretación:**
-*   **Superficie y Precio (0.75):** Confirmación visual de la intuición más básica. A más metros cuadrados, mayor es el precio. Es la relación más fuerte del dataset.
-*   **Ambientes, Dormitorios y Baños:** Estas tres características están fuertemente correlacionadas entre sí (ej. `ambientes` y `dormitorios` con 0.82), lo cual es lógico. Una propiedad con más ambientes tiende a tener más dormitorios y baños.
-*   **Cocheras:** Tiene una correlación positiva pero más débil con el precio (0.36), indicando que, si bien suma valor, no es tan determinante como la superficie o la cantidad de ambientes.
-
----
-
-## 🚀 **Cómo Generar estas Visualizaciones**
-
-Estas visualizaciones fueron generadas por el notebook `notebooks/EDA.ipynb`. Este notebook se conecta directamente a la base de datos para realizar un análisis de datos autónomo y guardar los gráficos.
+Este análisis fue generado por el notebook `notebooks/analisis_de_inversion.ipynb`. Este cuaderno se conecta directamente a la base de datos para realizar el análisis y guardar los gráficos.
 
 Para ejecutarlo y regenerar las imágenes, asegúrate de tener la base de datos corriendo y luego ejecuta desde la raíz del proyecto:
 
 ```bash
-jupyter nbconvert --to notebook --execute notebooks/EDA.ipynb
+jupyter nbconvert --to notebook --execute notebooks/analisis_de_inversion.ipynb
 ```
