@@ -1,7 +1,14 @@
 {
-    "model": "RandomForest",
-    "r2_score_mean": 0.8958625616467275,
-    "r2_score_std": 0.02177573329048406,
-    "rmse_usd_mean": 131200.1047327156,
-    "rmse_usd_std": 20013.98706030227
+    "model": "XGBoost",
+    "best_params": {
+        "subsample": 1.0,
+        "n_estimators": 300,
+        "max_depth": 7,
+        "learning_rate": 0.1,
+        "colsample_bytree": 1.0
+    },
+    "r2_score_mean": 0.9141472864905144,
+    "r2_score_std": 0.03549961541411899,
+    "rmse_usd_mean": 116397.9899188918,
+    "rmse_usd_std": 22375.878473124474
 }

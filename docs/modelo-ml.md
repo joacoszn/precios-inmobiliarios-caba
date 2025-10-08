@@ -1,12 +1,12 @@
-# 🤖 **Modelo de Machine Learning**
+# Modelo de Machine Learning
 
 Documentación técnica completa del modelo de predicción de precios inmobiliarios.
 
-## 🎯 **Objetivo del Modelo**
+## Objetivo del Modelo
 
 El modelo tiene como objetivo **predecir el precio en USD** de propiedades inmobiliarias en Capital Federal basándose en características estructuradas como ubicación, superficie y número de ambientes.
 
-## 📊 **Metodología: Modelo Híbrido (Estructurado + NLP)**
+## Metodología: Modelo Híbrido (Estructurado + NLP)
 
 Se ha evolucionado desde un modelo base hacia un **modelo híbrido** que combina:
 1.  **Datos Estructurados:** Características numéricas y categóricas tradicionales (superficie, ambientes, barrio).
@@ -14,7 +14,7 @@ Se ha evolucionado desde un modelo base hacia un **modelo híbrido** que combina
 
 Esta aproximación permite capturar matices y detalles valiosos que no están presentes en los datos estructurados, resultando en una predicción más precisa y contextualizada.
 
-## 🔧 **Preparación de Datos**
+## Preparación de Datos
 
 ### **Dataset**
 - **Registros:** 50,248 propiedades con datos limpios y validados
@@ -33,45 +33,48 @@ Esta aproximación permite capturar matices y detalles valiosos que no están pr
     - `balcon`, `luminoso`, `seguridad`, `pileta`, `gimnasio`, `sum`, `parrilla`, `estrenar`, `reciclado`, `cochera`, `amenities` (11 features booleanas)
 
 ### **Preprocesamiento**
-- **Feature Engineering (NLP):** Búsqueda de keywords en la columna `description` para crear 11 nuevas características booleanas.
+- **Feature Engineering (NLP):** Se utiliza `TfidfVectorizer` para convertir la columna `description` en un conjunto de 100 características numéricas que representan la importancia de las palabras en el texto. Este método es más robusto y captura más información que la simple búsqueda de keywords.
 - **One-Hot Encoding:** Variable categórica 'barrio' → 51 features resultantes.
-- **Composición Final:** 5 features numéricas + 51 de barrios + 11 de NLP = **67 features totales**.
+- **Composición Final:** 5 features numéricas + 51 de barrios + 100 de TF-IDF = **156 features totales**.
 - **División de datos:** 80% entrenamiento, 20% prueba.
 - **Validación de calidad:** Eliminación de registros con precios o barrios nulos.
 
-## 🌳 **Modelo Seleccionado**
+## Modelo Seleccionado
 
-### **Algoritmo: RandomForestRegressor**
-- **Estimadores:** 100 árboles de decisión
-- **Justificación:** Modelo de conjunto robusto que maneja bien la variabilidad de los datos inmobiliarios
-- **Parámetros:** `n_estimators=100`, `random_state=42`, `n_jobs=-1`
+### **Algoritmo: XGBoost (Extreme Gradient Boosting)**
+- **Justificación:** Tras un proceso de búsqueda de hiperparámetros, `XGBoost` demostró un rendimiento superior al `RandomForest`, logrando un error de predicción significativamente menor. Es un algoritmo de boosting de gradiente conocido por su eficiencia y precisión.
+- **Parámetros Optimizados:**
+    - `n_estimators`: 300
+    - `max_depth`: 7
+    - `learning_rate`: 0.1
+    - `subsample`: 1.0
+    - `colsample_bytree`: 1.0
 
-### **Ventajas del RandomForest**
-- **Robustez:** Maneja bien outliers y datos faltantes
-- **Interpretabilidad:** Proporciona feature importance
-- **Estabilidad:** Menos propenso al overfitting
-- **Confianza:** Permite calcular intervalos de confianza
+### **Ventajas del XGBoost**
+- **Rendimiento Superior:** Generalmente considerado el estado del arte para datos tabulares.
+- **Regularización:** Incluye regularización L1 y L2 para combatir el sobreajuste.
+- **Flexibilidad:** Altamente personalizable a través de sus numerosos hiperparámetros.
 
-## 📈 **Resultados y Evaluación con Validación Cruzada**
+## Resultados y Evaluación
 
-Para obtener una medida más fiable y robusta del rendimiento del modelo, se implementó **K-Fold Cross-Validation (con k=5)**. Esto implica dividir el dataset en 5 partes, entrenar y evaluar el modelo 5 veces, y promediar los resultados.
+Para obtener una medida fiable del rendimiento, se utilizó `RandomizedSearchCV` con validación cruzada de 5 pliegues para encontrar la mejor combinación de hiperparámetros. Las siguientes métricas reflejan el rendimiento del modelo `XGBoost` **optimizado**.
 
 ### **Métricas Promedio (k=5)**
 
-#### **R² Promedio: 0.896 (± 0.022)**
-- ✅ **Rendimiento Superior y Fiable:** El modelo explica, en promedio, el **89.6% de la variabilidad** de los precios. Este valor, al ser un promedio de 5 evaluaciones, es mucho más confiable que el 87.6% obtenido con un único split.
-- ✅ **Estabilidad:** La baja desviación estándar (± 0.022) indica que el modelo se comporta de manera consistente a través de diferentes subconjuntos de datos.
+#### **R² Promedio: 0.914 (± 0.035)**
+- **Rendimiento del Modelo:** El modelo explica el **91.4% de la variabilidad** de los precios, una mejora significativa que demuestra el valor de la optimización de hiperparámetros.
+- **Estabilidad:** La baja desviación estándar indica un comportamiento consistente del modelo.
 
-#### **RMSE Promedio: $131,200 USD (± $20,014)**
-- ✅ **Reducción Significativa del Error:** El error de predicción promedio se ha reducido en más de **$21,000 USD** en comparación con la evaluación anterior. 
-- ✅ **Contexto del Error:** La desviación estándar nos dice que, aunque el promedio es $131k, los errores en cada fold suelen variar en un rango de ±$20k, dándonos una idea clara de la consistencia del modelo.
+#### **RMSE Promedio: $116,398 USD (± $22,376)**
+- **Precisión del Modelo:** El error de predicción promedio se ha **reducido en casi $15,000 USD** en comparación con el modelo anterior sin optimizar, representando un avance sustancial en la precisión.
+- **Consistencia:** La desviación estándar da una idea clara de la consistencia del modelo a través de los diferentes pliegues de la validación cruzada.
 
 ### **Análisis de Predicciones**
 - **Comportamiento consistente** en el rango de precios más común
 - **Alineación con valores reales** en análisis de dispersión
 - **Capacidad de generalización** sólida para propiedades nuevas
 
-## 🔍 **Análisis Avanzado de Predicciones**
+## Análisis Avanzado de Predicciones
 
 ### **Intervalo de Confianza (95%)**
 - **Cálculo:** Basado en la desviación estándar de las predicciones de los 100 árboles
@@ -92,7 +95,7 @@ Para obtener una medida más fiable y robusta del rendimiento del modelo, se imp
 - **Interpretación:** Las características con mayor importancia tienen más impacto en las predicciones
 - **Uso:** Identificar qué factores influyen más en el precio
 
-## ⚙️ **Decisiones Técnicas Clave**
+## Decisiones Técnicas Clave
 
 ### **No Imputación de Variable Objetivo**
 - **Decisión:** Descartar registros sin `price_usd`
@@ -109,27 +112,23 @@ Para obtener una medida más fiable y robusta del rendimiento del modelo, se imp
 - **Justificación:** Este método proporciona una evaluación mucho más robusta del rendimiento del modelo. Al entrenar y probar el modelo en 5 combinaciones diferentes del dataset, nos aseguramos de que el rendimiento medido no sea producto de una división de datos afortunada o desafortunada. Reduce el sesgo y nos da una estimación más fiable de cómo se comportará el modelo con datos nuevos.
 - **Alternativa rechazada:** Mantener el `train_test_split` simple, que es más rápido pero menos fiable y no es una práctica recomendada para proyectos serios.
 
-### **Comparación de Modelos: RandomForest vs. XGBoost**
+### **Optimización de Hiperparámetros con RandomizedSearchCV**
+- **Decisión:** Implementar un proceso de búsqueda de hiperparámetros utilizando `RandomizedSearchCV` para explorar sistemáticamente un amplio rango de configuraciones para `RandomForest` y `XGBoost`.
+- **Justificación:** Los parámetros por defecto de un modelo raramente son los óptimos para un dataset específico. `RandomizedSearchCV` automatiza el proceso de encontrar una combinación de parámetros de alto rendimiento, mejorando significativamente la precisión del modelo final. Es un paso estándar en cualquier proyecto de machine learning serio.
+- **Alternativa rechazada:** `GridSearchCV`, que prueba todas las combinaciones posibles y puede ser computacionalmente prohibitivo. `RandomizedSearchCV` es más eficiente para una primera fase de optimización.
 
-Como parte de la Fase 2 de "Rigor Técnico", se realizó un experimento para comparar el rendimiento de nuestro modelo base `RandomForestRegressor` contra un `XGBRegressor`, un algoritmo conocido por su alto rendimiento.
+### **Comparación de Modelos**
 
-Ambos modelos fueron evaluados usando la misma estrategia de validación cruzada (K-Fold con 5 pliegues). El criterio de selección fue el **RMSE (Root Mean Squared Error) promedio**, donde un valor menor indica un mejor rendimiento.
-
-El notebook de entrenamiento fue programado para seleccionar automáticamente el modelo con el menor RMSE, re-entrenarlo con todos los datos y guardar sus artefactos.
+Tras la optimización de hiperparámetros, se realizó la comparación final entre el mejor `RandomForest` y el mejor `XGBoost`.
 
 **Resultado del Experimento:**
 
-El modelo seleccionado automáticamente fue **RandomForestRegressor**. Esto indica que su RMSE promedio fue inferior al de XGBoost en este dataset particular.
+El modelo **`XGBoost` optimizado** resultó ser el ganador, con un RMSE promedio de **$116,398 USD**, una mejora sustancial sobre el `RandomForest` optimizado.
 
-Las métricas del modelo ganador (`RandomForest`) son las que se reportan en la sección de evaluación:
-
-- **R² Promedio:** 0.896 (± 0.022)
-- **RMSE Promedio:** $131,200 USD (± $20,014)
-
-Aunque los resultados específicos de XGBoost no fueron persistidos en los artefactos finales, la lógica de selección garantiza su inferioridad en rendimiento (mayor RMSE) en esta comparación directa. La elección de RandomForest fue, por lo tanto, la decisión empíricamente validada.
+Esto confirma la hipótesis de que `XGBoost`, aunque más complejo, tiene una capacidad predictiva superior cuando sus hiperparámetros se sintonizan correctamente para el dataset en cuestión. La elección de `XGBoost` es, por lo tanto, la decisión final basada en evidencia empírica.
 
 ### **Feature Engineering Avanzado**
-- **NLP en descripciones:** ✅ **Implementado (v1 - Keywords)**. Extraer características como "luminoso", "balcón", "amenities".
+- **NLP en descripciones:** Implementado (v2 - TF-IDF). Se reemplazó la búsqueda de keywords por una vectorización TF-IDF (`TfidfVectorizer`) que genera 100 features, capturando de forma más efectiva la información del texto.
 - **Features derivadas:** Precio por m², ratio ambientes/superficie.
 - **Variables categóricas:** Tipo de construcción, antigüedad.
 
@@ -148,7 +147,7 @@ Aunque los resultados específicos de XGBoost no fueron persistidos en los artef
 - **Feature selection:** Eliminar características redundantes
 - **Cross-validation:** Evaluación más robusta
 
-## 📊 **Interpretación de Resultados**
+## Interpretación de Resultados
 
 ### **Feature Importance Típica (con NLP)**
 1. **Superficie total (42%):** Sigue siendo el factor más importante.
@@ -165,9 +164,9 @@ Aunque los resultados específicos de XGBoost no fueron persistidos en los artef
 - **Tamaño:** Superficie es el predictor más fuerte.
 - **Distribución:** Modelo funciona mejor en rango medio ($100K-$500K).
 
-## 🔗 **Enlaces Relacionados**
+## Enlaces Relacionados
 
-- **[📖 Referencia de API](referencia-api.md)** - Endpoints del modelo
-- **[📊 Visualizaciones](visualizaciones.md)** - Gráficos del modelo
-- **[💡 Ejemplos](ejemplos.md)** - Casos de uso prácticos
-- **[🏗️ Arquitectura](arquitectura.md)** - Diseño técnico
+- **[Referencia de API](referencia-api.md)** - Endpoints del modelo
+- **[Visualizaciones](visualizaciones.md)** - Gráficos del modelo
+- **[Ejemplos](ejemplos.md)** - Casos de uso prácticos
+- **[Arquitectura](arquitectura.md)** - Diseño técnico

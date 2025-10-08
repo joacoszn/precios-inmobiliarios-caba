@@ -11,5 +11,6 @@ pycache/
 Thumbs.db
 desktop.ini
 .ipynb_checkpoints/
+execution.log
 .gitattributesGEMINI.md
 *.nbconvert.ipynb
