@@ -1,4 +1,4 @@
-# MercadoInmobiliarioCABA: API de Análisis y Predicción de Precios Inmobiliarios basado en el mercado de la Ciudad Autonoma de Buenos Aires.
+# Real State CABA API: API de Análisis y Predicción de Precios Inmobiliarios basado en el mercado de la Ciudad Autonoma de Buenos Aires.
 
 [![Python](https://img.shields.io/badge/Python-3.12-blue.svg)](https://python.org)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.118-green.svg)](https://fastapi.tiangolo.com)
