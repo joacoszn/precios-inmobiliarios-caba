@@ -1,130 +1,126 @@
-# **preciosCABA: API de Análisis y Predicción de Precios Inmobiliarios**
+# MercadoInmobiliarioCABA: API de Análisis y Predicción de Precios Inmobiliarios basado en el mercado de la Ciudad Autonoma de Buenos Aires.
 
-[![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)](https://python.org)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-green.svg)](https://fastapi.tiangolo.com)
-[![Scikit-learn](https://img.shields.io/badge/Scikit--learn-1.3+-orange.svg)](https://scikit-learn.org)
-[![MySQL](https://img.shields.io/badge/MySQL-8.0+-blue.svg)](https://mysql.com)
+[![Python](https://img.shields.io/badge/Python-3.12-blue.svg)](https://python.org)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.118-green.svg)](https://fastapi.tiangolo.com)
+[![Docker](https://img.shields.io/badge/Docker-20.10+-blue.svg)](https://www.docker.com/)
+[![XGBoost](https://img.shields.io/badge/XGBoost-3.0-orange.svg)](https://xgboost.ai/)
 
-## 🏠 **¿Qué es preciosCABA?**
+## 🏠 ¿Qué es preciosCABA?
 
-Una API completa de análisis inmobiliario que procesa datos de propiedades en la Ciudad de Buenos Aires y ofrece:
+Una API de nivel profesional para el análisis del mercado inmobiliario que procesa datos de propiedades en la Ciudad de Buenos Aires y ofrece:
 
-- **📊 Análisis estadístico** del mercado inmobiliario
-- **🤖 Predicciones de precios** con intervalos de confianza
-- **📈 Visualizaciones** y insights de mercado
-- **🔍 Consultas avanzadas** con filtros y paginación
+- **🤖 Predicciones de precios** precisas utilizando un modelo XGBoost optimizado.
+- **🧠 Explicabilidad de predicciones (XAI)**, detallando qué factores influyen en cada estimación.
+- **📊 Consultas estadísticas** sobre el mercado inmobiliario.
+- **📈 Visualizaciones** y insights de mercado.
 
-## 🚀 **Inicio Rápido**
+## 🚀 Inicio Rápido (con Docker)
+
+El proyecto está containerizado para un despliegue rápido y sencillo. Solo necesita tener Docker instalado.
+
+**1. Crear archivo de credenciales (`.env`)**
+
+En la raíz del proyecto (`api/`), cree un archivo llamado `.env` con el siguiente contenido, reemplazando los valores con sus credenciales de MySQL:
+
+```
+DB_USER=su_usuario_de_mysql
+DB_PASSWORD=su_contraseña_de_mysql
+DB_HOST=host.docker.internal
+DB_NAME=inmobiliario
+```
+> **Nota:** `host.docker.internal` es un DNS especial que permite al contenedor conectarse a la base de datos que corre en su máquina local.
+
+**2. Construir la imagen de Docker**
 
 ```bash
-# 1. Clonar el repositorio
-git clone <tu-repo>
-cd api-analisis-inmobiliario-caba/api
-
-# 2. Instalar dependencias
-pip install -r requirements.txt
-
-# 3. Configurar base de datos (ver docs/inicio-rapido.md)
-cp .env.example .env
-
-# 4. Poblar la base de datos
-python scripts/poblar_db.py
-
-# 5. Entrenar el modelo
-jupyter notebook notebooks/entrenamiento_modelo.ipynb
-
-# 6. Iniciar la API
-uvicorn src.api.main:app --reload
+docker build -t real-estate-api .
 ```
 
-**🌐 Acceder a la documentación:** http://127.0.0.1:8000/docs
+**3. Ejecutar el contenedor**
 
-## 📚 **Documentación Completa**
+```bash
+docker run -d -p 8000:8000 --name real-estate-container --env-file .env real-estate-api
+```
 
-- **[🚀 Inicio Rápido](docs/inicio-rapido.md)** - Instalación y configuración paso a paso
-- **[📖 Referencia de API](docs/referencia-api.md)** - Documentación completa de endpoints
-- **[🤖 Modelo de ML](docs/modelo-ml.md)** - Detalles del modelo de Machine Learning
-- **[🏗️ Arquitectura](docs/arquitectura.md)** - Diseño técnico y decisiones
-- **[📊 Visualizaciones](docs/visualizaciones.md)** - Gráficos y análisis estadísticos
-- **[💡 Ejemplos](docs/ejemplos.md)** - Casos de uso y ejemplos prácticos
+**4. Acceder a la API**
 
-## 🎯 **Características Principales**
+La API ahora está corriendo en segundo plano. Puede acceder a la documentación interactiva (Swagger UI) en:
+**[http://localhost:8000/docs](http://localhost:8000/docs)**
 
-### **Machine Learning Avanzado**
-- ✅ Modelo RandomForest con R² = 0.87
-- ✅ Intervalos de confianza del 95%
-- ✅ Análisis de propiedades similares
-- ✅ Feature importance y metadata del modelo
+## Documentación Completa
 
-### **API REST Completa**
-- ✅ CRUD completo de propiedades
-- ✅ Filtros avanzados y paginación
-- ✅ Estadísticas por barrio y evolución temporal
-- ✅ Validaciones estrictas de input
+Para un entendimiento profundo del proyecto, consulte la carpeta `docs/`:
 
-### **Análisis de Datos**
-- ✅ ETL robusto con limpieza de datos
-- ✅ 50,000+ registros procesados
-- ✅ Visualizaciones interactivas
-- ✅ Insights de mercado en tiempo real
+- **[Referencia de API](docs/referencia-api.md)** - Documentación completa de endpoints.
+- **[Modelo de ML](docs/modelo-ml.md)** - Detalles del modelo, feature engineering y métricas.
+- **[Arquitectura](docs/arquitectura.md)** - Diseño técnico y decisiones.
+- **[Visualizaciones](docs/visualizaciones.md)** - Gráficos y análisis estadísticos.
 
-## 🛠️ **Tecnologías Utilizadas**
+## Características Principales
 
-- **Backend:** FastAPI, Pydantic, MySQL
-- **Machine Learning:** Scikit-learn, Pandas, NumPy
-- **Análisis:** Jupyter Notebooks, Matplotlib, Seaborn
-- **Infraestructura:** Docker-ready, Logging estructurado
+- **Machine Learning Avanzado:**
+  - Modelo `XGBoost` optimizado con `RandomizedSearchCV` (R² = 0.914).
+  - Explicabilidad de predicciones (XAI) con `SHAP` a través del endpoint `/explain`.
+  - Feature Engineering con `TF-IDF` para procesar descripciones textuales.
+- **API Robusta:**
+  - Endpoints para predicción, explicación e información del modelo.
+  - Suite de tests unitarios con `pytest` que garantiza la fiabilidad.
+  - Validaciones de entrada de datos con `Pydantic`.
+- **Containerización:**
+  - `Dockerfile` optimizado para producción.
+  - Archivo `.dockerignore` para builds limpios y rápidos.
 
-## 📊 **Ejemplo de Predicción**
+## 🛠️ Tecnologías Utilizadas
+
+- **Backend:** FastAPI, Pydantic, Uvicorn
+- **Machine Learning:** Scikit-learn, XGBoost, SHAP, Pandas, NumPy
+- **Base de Datos:** MySQL
+- **Testing:** Pytest
+- **Despliegue:** Docker
+
+## Ejemplo de Explicación (XAI)
 
 ```json
-POST /predict/
+POST /predict/explain
 {
   "barrio": "Palermo",
-  "ambientes": 3,
-  "dormitorios": 2,
-  "banos": 2,
-  "superficie_total_m2": 80,
-  "cocheras": 1
+  "ambientes": 2,
+  "superficie_total_m2": 50,
+  "dormitorios": 1,
+  "banos": 1,
+  "cocheras": 0,
+  "description": "Departamento luminoso en el corazón de Palermo, cerca del subte."
 }
 ```
 
-**Respuesta:**
+**Respuesta (Ejemplo):**
 ```json
 {
-  "predicted_price_usd": 185000.0,
-  "confidence_interval": {"lower": 170000, "upper": 200000},
-  "similar_properties_avg": 178500.0
+  "base_value": 150000.0,
+  "shap_values": [
+    { "feature": "superficie_total_m2", "value": 45000.0 },
+    { "feature": "barrio_Palermo", "value": 25000.0 },
+    { "feature": "tfidf_25", "value": 3500.0 },
+    { "feature": "ambientes", "value": -2000.0 }
+  ],
+  "prediction_usd": 221500.0
 }
 ```
 
-## 📈 **Estado del Proyecto**
+## Estado del Proyecto: Completado
 
-### **✅ Completado**
-- [x] Análisis exploratorio de datos (EDA)
-- [x] Pipeline ETL completo con limpieza de datos
-- [x] API REST con CRUD completo
-- [x] Modelo de ML con análisis avanzado
-- [x] Validaciones estrictas y logging
-- [x] Documentación técnica completa
+- [x] Análisis Exploratorio de Datos (EDA).
+- [x] Pipeline ETL para limpieza y carga de datos.
+- [x] Feature Engineering avanzado con TF-IDF.
+- [x] Comparación y optimización de modelos (RandomForest vs. XGBoost).
+- [x] Implementación de explicabilidad del modelo (XAI con SHAP).
+- [x] API REST completa con endpoints de predicción y explicación.
+- [x] Suite de tests unitarios con Pytest.
+- [x] Containerización de la aplicación con Docker.
+- [x] Documentación técnica completa de todo el proceso.
 
-### **🚀 En Desarrollo**
-- [ ] Feature engineering con NLP
-- [ ] Dashboard interactivo con Streamlit
-- [ ] Validación cruzada y métricas adicionales
+## 👨‍💻 Sobre el Proyecto
 
-## 👨‍💻 **Sobre el Proyecto**
-
-Este proyecto forma parte de mi portfolio personal como estudiante de programación orientado a **Ciencia de Datos e Inteligencia Artificial**.
-
-**Tecnologías demostradas:**
-- 🔧 **Ingeniería de Datos:** ETL, limpieza, validación
-- 🤖 **Machine Learning:** Modelado, evaluación, despliegue
-- 🌐 **Desarrollo Backend:** APIs REST, bases de datos
-- 📊 **Análisis de Datos:** EDA, visualizaciones, insights
+Este proyecto demuestra un ciclo de vida de ciencia de datos completo y de nivel profesional, desde el análisis exploratorio hasta el despliegue de un modelo interpretable en un contenedor, siguiendo las mejores prácticas de la industria en MLOps y desarrollo de software.
 
 **Contacto:** joaquin99911@gmail.com
-
----
-
-*Este proyecto demuestra un ciclo completo de ciencia de datos, desde el análisis exploratorio hasta el despliegue de un modelo de ML en producción, siguiendo las mejores prácticas de la industria.*

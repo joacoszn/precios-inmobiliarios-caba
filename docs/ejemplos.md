@@ -1,8 +1,8 @@
-# 💡 **Ejemplos y Casos de Uso**
+# **Ejemplos y Casos de Uso**
 
 Esta sección contiene ejemplos prácticos de cómo usar la API de análisis inmobiliario para diferentes casos de uso.
 
-## 🎯 **Casos de Uso Principales**
+## **Casos de Uso Principales**
 
 ### **1. Análisis de Mercado para Inversores**
 ### **2. Evaluación de Propiedades para Compradores**
@@ -10,7 +10,7 @@ Esta sección contiene ejemplos prácticos de cómo usar la API de análisis inm
 ### **4. Análisis Comparativo de Barrios**
 ### **5. Investigación de Tendencias del Mercado**
 
-## 🏠 **Caso de Uso 1: Análisis de Mercado para Inversores**
+## **Caso de Uso 1: Análisis de Mercado para Inversores**
 
 ### **Escenario**
 Un inversor quiere analizar el mercado inmobiliario de CABA para identificar oportunidades de inversión.
@@ -113,9 +113,9 @@ curl "http://127.0.0.1:8000/propiedades/?barrio=Recoleta&ambientes_min=3&ambient
 - **Promedio de similares:** $268,000
 - **Rango de confianza:** $250,000 - $300,000
 
-**✅ Recomendación:** El precio está dentro del rango esperado, ligeramente por encima del promedio pero justificado por la ubicación premium.
+**Recomendación:** El precio está dentro del rango esperado, ligeramente por encima del promedio pero justificado por la ubicación premium.
 
-## 💰 **Caso de Uso 3: Pricing para Vendedores**
+## **Caso de Uso 3: Pricing para Vendedores**
 
 ### **Escenario**
 Un vendedor quiere determinar el precio óptimo para su propiedad en Belgrano.
@@ -168,7 +168,7 @@ curl "http://127.0.0.1:8000/propiedades/?barrio=Belgrano&ambientes=3&superficie_
 - **Promedio de similares:** $162,000
 - **Precio recomendado:** $165,000 - $170,000 (centro del rango de confianza)
 
-## 🏘️ **Caso de Uso 4: Análisis Comparativo de Barrios**
+## **Caso de Uso 4: Análisis Comparativo de Barrios**
 
 ### **Escenario**
 Un usuario quiere comparar diferentes barrios para decidir dónde comprar.
@@ -231,7 +231,7 @@ done
 - **Premium:** Recoleta (mayor precio)
 - **Equilibrio:** Belgrano (precio medio, buena ubicación)
 
-## 📈 **Caso de Uso 5: Investigación de Tendencias del Mercado**
+## **Caso de Uso 5: Investigación de Tendencias del Mercado**
 
 ### **Escenario**
 Un analista quiere investigar las tendencias del mercado inmobiliario.
@@ -264,9 +264,41 @@ curl "http://127.0.0.1:8000/estadisticas/evolucion-mercado/" | jq
 ]
 ```
 
-#### **2. Análisis de Feature Importance**
+### Obtener Información del Modelo
+
 ```bash
-curl "http://127.0.0.1:8000/predict/model-info" | jq '.top_features'
+curl http://127.0.0.1:8000/predict/model-info
+```
+
+### Explicar una Predicción (XAI)
+
+Para entender qué factores influyen en una predicción específica, puede usar el endpoint `/explain`.
+
+**Request:**
+```bash
+curl -X POST "http://127.0.0.1:8000/predict/explain" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "barrio": "Palermo",
+    "ambientes": 2,
+    "superficie_total_m2": 50,
+    "dormitorios": 1,
+    "banos": 1,
+    "cocheras": 0,
+    "description": "Departamento luminoso en el corazón de Palermo."
+  }'
+```
+
+**Response (Ejemplo):**
+```json
+{
+  "base_value": 150000.0,
+  "shap_values": [
+    { "feature": "superficie_total_m2", "value": 45000.0 },
+    { "feature": "barrio_Palermo", "value": 25000.0 }
+  ],
+  "prediction_usd": 221500.0
+}
 ```
 
 ### **Tendencias Identificadas**
@@ -274,7 +306,7 @@ curl "http://127.0.0.1:8000/predict/model-info" | jq '.top_features'
 - **Oferta estable:** Cantidad de propiedades se mantiene
 - **Factores clave:** Superficie (45%), ubicación (22%), ambientes (8%)
 
-## 🔧 **Scripts de Automatización**
+## **Scripts de Automatización**
 
 ### **Script de Análisis Completo**
 ```python
@@ -338,9 +370,9 @@ if __name__ == "__main__":
     print(json.dumps(resultado, indent=2, ensure_ascii=False))
 ```
 
-## 🔗 **Enlaces Relacionados**
+## **Enlaces Relacionados**
 
-- **[📖 Referencia de API](referencia-api.md)** - Documentación completa de endpoints
-- **[🤖 Modelo de ML](modelo-ml.md)** - Detalles técnicos del modelo
-- **[📊 Visualizaciones](visualizaciones.md)** - Gráficos y análisis visual
-- **[🚀 Inicio Rápido](inicio-rapido.md)** - Configuración inicial
+- **[Referencia de API](referencia-api.md)** - Documentación completa de endpoints
+- **[Modelo de ML](modelo-ml.md)** - Detalles técnicos del modelo
+- **[Visualizaciones](visualizaciones.md)** - Gráficos y análisis visual
+- **[Inicio Rápido](inicio-rapido.md)** - Configuración inicial

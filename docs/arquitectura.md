@@ -157,28 +157,29 @@ connection_pool = mysql.connector.pooling.MySQLConnectionPool(
 )
 ```
 
-## 🤖 **Arquitectura de Machine Learning**
+## Arquitectura de Machine Learning
 
-### **Pipeline de ML**
+### Pipeline de ML
 ```
 Datos Crudos → Limpieza → NLP Feature Engineering → Entrenamiento → Persistencia → Predicción
      │              │              │                   │            │              │
      │              │              │                   │            │              │
-  MySQL DB    Preprocessing   Keyword Extraction   RandomForest   Pickle       API Endpoint
+  MySQL DB    Preprocessing   TF-IDF Vectorization   XGBoost      Pickle       API Endpoint
 ```
 
-### **Separación de Responsabilidades**
-- **`notebooks/entrenamiento_modelo.ipynb`:** Entrenamiento y evaluación
-- **`src/ml/feature_engineering.py`:** Lógica para extraer features de texto.
-- **`src/ml/predict.py`:** Lógica de predicción en producción
-- **`src/ml/model.pkl`:** Modelo serializado
-- **`src/ml/model_columns.pkl`:** Metadatos del modelo
+### Separación de Responsabilidades
+- **`notebooks/entrenamiento_modelo.ipynb`:** Entrenamiento, comparación y optimización de modelos.
+- **`src/ml/feature_engineering.py`:** Lógica para la vectorización TF-IDF.
+- **`src/ml/predict.py`:** Lógica de predicción y explicabilidad (SHAP).
+- **`src/ml/model.pkl`:** Modelo serializado (XGBoost optimizado).
+- **`src/ml/tfidf_vectorizer.pkl`:** Vectorizador TF-IDF entrenado.
+- **`src/ml/model_columns.pkl`:** Metadatos de las columnas del modelo.
 
-### **Decisiones de Modelado**
-- **Algoritmo:** RandomForestRegressor
-- **Justificación:** Robusto, interpretable, maneja bien outliers
-- **Features:** 63 características (51 barrios + 5 numéricas + 11 NLP)
-- **Validación:** Train/test split 80/20
+### Decisiones de Modelado
+- **Algoritmo:** XGBoost
+- **Justificación:** Rendimiento superior demostrado tras optimización de hiperparámetros.
+- **Features:** 156 características (5 numéricas + 51 de barrios + 100 de TF-IDF).
+- **Validación:** K-Fold Cross-Validation (k=5) y `RandomizedSearchCV` para optimización.
 
 ## 🔒 **Seguridad y Configuración**
 
@@ -244,61 +245,52 @@ logger.info(
 - **Base de datos:** Read replicas para consultas
 - **Caching:** Redis para consultas frecuentes
 
-## 🔧 **Herramientas y Tecnologías**
+## Herramientas y Tecnologías
 
-### **Stack Tecnológico**
+### Stack Tecnológico
 - **Backend:** FastAPI, Pydantic, Uvicorn
-- **Base de datos:** MySQL 8.0, mysql-connector-python
-- **Machine Learning:** Scikit-learn, Pandas, NumPy
+- **Base de datos:** MySQL 8.0
+- **Machine Learning:** Scikit-learn, XGBoost, SHAP, Pandas, NumPy
 - **Análisis:** Jupyter Notebooks, Matplotlib, Seaborn
+- **Testing:** Pytest
+- **Despliegue:** Docker
 - **Configuración:** python-dotenv
-- **Logging:** logging (built-in)
 
-### **Herramientas de Desarrollo**
-- **Control de versiones:** Git
-- **Documentación:** Markdown, Swagger
-- **Testing:** pytest (preparado para implementar)
-- **Containerización:** Docker (preparado para implementar)
+## Métricas de Calidad
 
-## 📈 **Métricas de Calidad**
-
-### **Código**
-- **Cobertura:** Preparado para implementar testing
+### Código
+- **Cobertura de Tests:** Implementada para lógica de ML y endpoints de API.
 - **Linting:** Sin errores de linting
 - **Type hints:** 100% de funciones tipadas
-- **Documentación:** Documentación completa en código
+- **Documentación:** Documentación completa en código y en `docs/`.
 
-### **Modelo de ML**
-- **R²:** 0.8764 (excelente)
-- **RMSE:** $152,468 USD (contextualizado)
-- **Validación:** Train/test split
-- **Persistencia:** Modelo serializado correctamente
+### Modelo de ML
+- **R²:** 0.914 (excelente)
+- **RMSE:** ~$116,398 USD (contextualizado)
+- **Validación:** K-Fold Cross-Validation y RandomizedSearchCV
+- **Persistencia:** Modelo y artefactos serializados correctamente
 
-### **API**
-- **Response time:** < 100ms para predicciones
+### API
+- **Response time:** < 150ms para predicciones y explicaciones.
 - **Availability:** 99.9% (sin dependencias externas)
 - **Error rate:** < 1% (validaciones estrictas)
-- **Documentation:** Swagger automático
+- **Documentation:** Swagger automático y documentación manual.
 
-## 🔮 **Roadmap de Mejoras**
+## Roadmap de Mejoras
 
-### **Corto Plazo**
-- **Testing:** Unit tests y integration tests
-- **CI/CD:** GitHub Actions
-- **Docker:** Containerización completa
-- **Monitoring:** Métricas avanzadas
+### Corto Plazo
+- **CI/CD:** Pipeline con GitHub Actions para automatizar tests y builds de Docker.
+- **Monitoring:** Integrar un dashboard para visualizar métricas de la API en tiempo real (ej. Grafana).
 
-### **Mediano Plazo**
-- **Microservicios:** Separación completa de ETL, ML y API
-- **MLOps:** MLflow para experiment tracking
-- **Caching:** Redis para consultas frecuentes
-- **Rate limiting:** Protección contra abuso
+### Mediano Plazo
+- **Microservicios:** Separación completa de ETL, ML y API.
+- **MLOps:** MLflow para experiment tracking y registro de modelos.
+- **Caching:** Redis para resultados de endpoints de estadísticas.
 
-### **Largo Plazo**
-- **Real-time:** WebSocket para predicciones en tiempo real
-- **ML Pipeline:** Entrenamiento automático
-- **Analytics:** Dashboard avanzado con Streamlit
-- **Multi-tenant:** Soporte para múltiples ciudades
+### Largo Plazo
+- **Real-time:** WebSocket para predicciones en tiempo real.
+- **ML Pipeline:** Re-entrenamiento automático del modelo.
+- **Analytics:** Dashboard interactivo para el usuario final (ej. Streamlit o Dash).
 
 ## 🔗 **Enlaces Relacionados**
 

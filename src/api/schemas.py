@@ -121,5 +121,15 @@ class ModelInfo(BaseModel):
     top_features: List[FeatureImportance]
 
 
+class ShapValue(BaseModel):
+    feature: str
+    value: float
+
+class PredictionExplanation(BaseModel):
+    base_value: float
+    shap_values: List[ShapValue]
+    prediction_usd: float
+
+
 
 
