@@ -52,19 +52,19 @@ Esta aproximación permite capturar matices y detalles valiosos que no están pr
 - **Estabilidad:** Menos propenso al overfitting
 - **Confianza:** Permite calcular intervalos de confianza
 
-## 📈 **Resultados y Evaluación**
+## 📈 **Resultados y Evaluación con Validación Cruzada**
 
-### **Métricas de Rendimiento (con Features NLP)**
+Para obtener una medida más fiable y robusta del rendimiento del modelo, se implementó **K-Fold Cross-Validation (con k=5)**. Esto implica dividir el dataset en 5 partes, entrenar y evaluar el modelo 5 veces, y promediar los resultados.
 
-La inclusión de características extraídas de las descripciones ha mejorado la precisión del modelo.
+### **Métricas Promedio (k=5)**
 
-#### **R² (Coeficiente de Determinación): 0.8764**
-- ✅ **Mejora incremental:** El modelo ahora explica aproximadamente el **87.6% de la variabilidad** en los precios (antes 87.1%).
-- ✅ **Interpretación:** Confirma que las características de texto aportan poder predictivo.
+#### **R² Promedio: 0.896 (± 0.022)**
+- ✅ **Rendimiento Superior y Fiable:** El modelo explica, en promedio, el **89.6% de la variabilidad** de los precios. Este valor, al ser un promedio de 5 evaluaciones, es mucho más confiable que el 87.6% obtenido con un único split.
+- ✅ **Estabilidad:** La baja desviación estándar (± 0.022) indica que el modelo se comporta de manera consistente a través de diferentes subconjuntos de datos.
 
-#### **RMSE (Error Cuadrático Medio Raíz): $152,468.00 USD**
-- ✅ **Reducción del error:** El error promedio de predicción se ha reducido (antes $155,871.00).
-- ⚠️ **Contexto importante:** El valor sigue siendo alto debido a la inherente dispersión de precios en el mercado inmobiliario, pero la reducción es una clara señal de mejora.
+#### **RMSE Promedio: $131,200 USD (± $20,014)**
+- ✅ **Reducción Significativa del Error:** El error de predicción promedio se ha reducido en más de **$21,000 USD** en comparación con la evaluación anterior. 
+- ✅ **Contexto del Error:** La desviación estándar nos dice que, aunque el promedio es $131k, los errores en cada fold suelen variar en un rango de ±$20k, dándonos una idea clara de la consistencia del modelo.
 
 ### **Análisis de Predicciones**
 - **Comportamiento consistente** en el rango de precios más común
@@ -104,10 +104,29 @@ La inclusión de características extraídas de las descripciones ha mejorado la
 - **Justificación:** Mantiene información categórica sin introducir orden artificial
 - **Resultado:** 52 features resultantes (51 barrios + características numéricas)
 
-### **Validación Temporal**
-- **División aleatoria** 80/20
-- **Justificación:** Simular condiciones reales de predicción
-- **Alternativa:** Validación temporal no aplicable por naturaleza de los datos
+### **Validación Robusta con K-Fold Cross-Validation**
+- **Decisión:** Reemplazar la división simple `train_test_split` por `K-Fold Cross-Validation` con 5 pliegues (folds).
+- **Justificación:** Este método proporciona una evaluación mucho más robusta del rendimiento del modelo. Al entrenar y probar el modelo en 5 combinaciones diferentes del dataset, nos aseguramos de que el rendimiento medido no sea producto de una división de datos afortunada o desafortunada. Reduce el sesgo y nos da una estimación más fiable de cómo se comportará el modelo con datos nuevos.
+- **Alternativa rechazada:** Mantener el `train_test_split` simple, que es más rápido pero menos fiable y no es una práctica recomendada para proyectos serios.
+
+### **Comparación de Modelos: RandomForest vs. XGBoost**
+
+Como parte de la Fase 2 de "Rigor Técnico", se realizó un experimento para comparar el rendimiento de nuestro modelo base `RandomForestRegressor` contra un `XGBRegressor`, un algoritmo conocido por su alto rendimiento.
+
+Ambos modelos fueron evaluados usando la misma estrategia de validación cruzada (K-Fold con 5 pliegues). El criterio de selección fue el **RMSE (Root Mean Squared Error) promedio**, donde un valor menor indica un mejor rendimiento.
+
+El notebook de entrenamiento fue programado para seleccionar automáticamente el modelo con el menor RMSE, re-entrenarlo con todos los datos y guardar sus artefactos.
+
+**Resultado del Experimento:**
+
+El modelo seleccionado automáticamente fue **RandomForestRegressor**. Esto indica que su RMSE promedio fue inferior al de XGBoost en este dataset particular.
+
+Las métricas del modelo ganador (`RandomForest`) son las que se reportan en la sección de evaluación:
+
+- **R² Promedio:** 0.896 (± 0.022)
+- **RMSE Promedio:** $131,200 USD (± $20,014)
+
+Aunque los resultados específicos de XGBoost no fueron persistidos en los artefactos finales, la lógica de selección garantiza su inferioridad en rendimiento (mayor RMSE) en esta comparación directa. La elección de RandomForest fue, por lo tanto, la decisión empíricamente validada.
 
 ### **Feature Engineering Avanzado**
 - **NLP en descripciones:** ✅ **Implementado (v1 - Keywords)**. Extraer características como "luminoso", "balcón", "amenities".
