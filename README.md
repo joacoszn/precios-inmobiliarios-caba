@@ -5,7 +5,7 @@
 [![Docker](https://img.shields.io/badge/Docker-20.10+-blue.svg)](https://www.docker.com/)
 [![XGBoost](https://img.shields.io/badge/XGBoost-3.0-orange.svg)](https://xgboost.ai/)
 
-## 🏠 ¿Qué es preciosCABA?
+## 🏠 ¿Qué es RealStateCABA?
 
 Una API de nivel profesional para el análisis del mercado inmobiliario que procesa datos de propiedades en la Ciudad de Buenos Aires y ofrece:
 
