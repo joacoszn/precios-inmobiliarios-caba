@@ -11,22 +11,30 @@ from dotenv import load_dotenv
 
 # Importar nuestra nueva función de feature engineering
 from .feature_engineering import crear_features_nlp
+import shap
 
 load_dotenv()
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Construimos las rutas a los archivos del modelo
+# Rutas a los archivos del modelo
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_PATH = os.path.join(BASE_DIR, 'model.pkl')
 COLUMNS_PATH = os.path.join(BASE_DIR, 'model_columns.pkl')
+VECTORIZER_PATH = os.path.join(BASE_DIR, 'tfidf_vectorizer.pkl') # Nueva ruta
 
-# --- Carga de artefactos del modelo ---
+# Carga de artefactos del modelo.
+explainer = None # Inicializar explainer
 try:
     with open(MODEL_PATH, 'rb') as f:
         model = pickle.load(f)
     print("✅ Modelo cargado exitosamente.")
+    
+    # Crear el explainer de SHAP una vez que el modelo está cargado
+    explainer = shap.TreeExplainer(model)
+    print("✅ Explainer de SHAP creado exitosamente.")
+
 except FileNotFoundError:
     print(f"❌ Error: No se encontró el archivo del modelo en {MODEL_PATH}")
     model = None
@@ -39,16 +47,24 @@ except FileNotFoundError:
     print(f"❌ Error: No se encontró el archivo de columnas en {COLUMNS_PATH}")
     model_columns = None
 
+try:
+    with open(VECTORIZER_PATH, 'rb') as f:
+        vectorizer = pickle.load(f)
+    print("✅ Vectorizer TF-IDF cargado exitosamente.")
+except FileNotFoundError:
+    print(f"❌ Error: No se encontró el archivo del vectorizer en {VECTORIZER_PATH}")
+    vectorizer = None
+
 def predict_price(data: dict) -> dict:
     """Retorna predicción + intervalo de confianza, ahora procesando la descripción."""
-    if model is None or model_columns is None:
-        raise RuntimeError("El modelo o las columnas no se han cargado correctamente.")
+    if model is None or model_columns is None or vectorizer is None:
+        raise RuntimeError("El modelo, las columnas o el vectorizer no se han cargado correctamente.")
 
     # Convertir el diccionario de entrada a un DataFrame
     input_df = pd.DataFrame([data])
     
-    # Crear las caractersticas NLP desde la descripción (si existe)
-    nlp_features_df = crear_features_nlp(input_df, 'description')
+    # Crear las caractersticas NLP usando el vectorizer CARGADO
+    nlp_features_df, _ = crear_features_nlp(input_df, 'description', vectorizer=vectorizer)
 
     # unir las características originales con las nuevas características NLP
     input_df_no_desc = input_df.drop(columns=['description'], errors='ignore')
@@ -61,9 +77,13 @@ def predict_price(data: dict) -> dict:
     # Realizar la predicción
     prediction = model.predict(final_df)[0]
     
-    # intervalo de confianza
-    tree_predictions = [tree.predict(final_df)[0] for tree in model.estimators_]
-    std = np.std(tree_predictions)
+    # Calcular intervalo de confianza solo si el modelo es RandomForest
+    lower_bound, upper_bound = None, None
+    if hasattr(model, 'estimators_'): # Chequeo robusto si el modelo tiene árboles individuales
+        tree_predictions = [tree.predict(final_df)[0] for tree in model.estimators_]
+        std = np.std(tree_predictions)
+        lower_bound = float(prediction - 1.96 * std)
+        upper_bound = float(prediction + 1.96 * std)
     
     logger.info(
         f"Predicción realizada: {prediction:.2f} USD | "
@@ -74,8 +94,8 @@ def predict_price(data: dict) -> dict:
     return {
         "predicted_price_usd": float(prediction),
         "confidence_interval": {
-            "lower": float(prediction - 1.96 * std),
-            "upper": float(prediction + 1.96 * std)
+            "lower": lower_bound,
+            "upper": upper_bound
         }
     }
 

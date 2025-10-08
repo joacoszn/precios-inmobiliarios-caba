@@ -1,11 +1,17 @@
 # src/api/routers/predictions.py
 from fastapi import APIRouter, HTTPException, Depends
-from ..schemas import PredictionInput, PredictionOutput, ModelInfo
-from ...ml.predict import predict_price, get_similar_properties_avg, model, model_columns
+from ..schemas import PredictionInput, PredictionOutput, ModelInfo, PredictionExplanation, ShapValue
+from ...ml.predict import (
+    predict_price, get_similar_properties_avg, 
+    model, model_columns, vectorizer, explainer
+)
+from ...ml.feature_engineering import crear_features_nlp
 from ..db_connection import get_db_cursor
 from mysql.connector.cursor import MySQLCursorDict
 import json
 import os
+import pandas as pd
+import numpy as np
 
 # ruta de de forma relativa y robusta
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -79,3 +85,52 @@ def get_model_info():
         "top_features": feature_importance
     }
 
+@router.post("/explain", response_model=PredictionExplanation, summary="Explicar una predicción de precio")
+def explain_property_price(input_data: PredictionInput):
+    """
+    Recibe las características de una propiedad y devuelve un análisis de SHAP
+    que explica cómo cada característica contribuye a la predicción final.
+    """
+    if explainer is None or model is None or model_columns is None or vectorizer is None:
+        raise HTTPException(
+            status_code=503, 
+            detail="El explicador del modelo no está disponible."
+        )
+
+    try:
+        # --- Replicar el pipeline de transformación de datos ---
+        data_dict = input_data.model_dump()
+        input_df = pd.DataFrame([data_dict])
+        
+        nlp_features_df, _ = crear_features_nlp(input_df, 'description', vectorizer=vectorizer)
+        
+        input_df_no_desc = input_df.drop(columns=['description'], errors='ignore')
+        input_enriquecido = pd.concat([input_df_no_desc, nlp_features_df], axis=1)
+
+        input_encoded = pd.get_dummies(input_enriquecido, columns=['barrio'], dtype=int)
+        
+        final_df = input_encoded.reindex(columns=model_columns, fill_value=0)
+        
+        # --- Calcular valores SHAP ---
+        shap_values = explainer.shap_values(final_df)
+        
+        # Formatear la salida
+        shap_values_list = []
+        for feature, shap_value in zip(final_df.columns, shap_values[0]):
+            # Solo incluir features que tienen un impacto (no son cero)
+            if shap_value != 0:
+                shap_values_list.append(ShapValue(feature=feature, value=shap_value))
+        
+        # Ordenar por valor absoluto para mostrar los más importantes primero
+        shap_values_list.sort(key=lambda x: abs(x.value), reverse=True)
+        
+        base_value = explainer.expected_value
+        prediction = np.sum(shap_values[0]) + base_value
+
+        return PredictionExplanation(
+            base_value=base_value,
+            shap_values=shap_values_list[:15], # Devolver solo los 15 más importantes
+            prediction_usd=prediction
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al generar la explicación: {e}")
