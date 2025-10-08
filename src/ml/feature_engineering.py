@@ -1,51 +1,37 @@
-# src/ml/feature_engineering.py
+
 import pandas as pd
-from typing import List
+from sklearn.feature_extraction.text import TfidfVectorizer
+import pickle
 
-# Definicion de keywords
-# Basado en el análisis exploratorio, estas palabras tienen un alto potencial predictivo.
-KEYWORDS: List[str] = [
-    'balcon', 
-    'luminoso', 
-    'seguridad', 
-    'pileta', 
-    'gimnasio', 
-    'sum', 
-    'parrilla', 
-    'estrenar',  
-    'reciclado', 
-    'cochera', 
-    'amenities'
-]
-
-def crear_features_nlp(df: pd.DataFrame, text_column: str = 'description') -> pd.DataFrame:
+def crear_features_nlp(df: pd.DataFrame, text_column: str = 'description', vectorizer=None):
     """
-    Analiza una columna de texto en un DataFrame y crea características booleanas
-    basadas en la presencia de palabras clave predefinidas.
+    Procesa una columna de texto para crear características TF-IDF.
 
     Args:
-        df (pd.DataFrame): El DataFrame de entrada que contiene la columna de texto.
-        text_column (str): El nombre de la columna que contiene las descripciones.
+        df (pd.DataFrame): DataFrame de entrada.
+        text_column (str): Nombre de la columna con el texto.
+        vectorizer (TfidfVectorizer, optional): Vectorizer pre-entrenado. 
+            Si es None, se creará y entrenará uno nuevo.
 
     Returns:
-        pd.DataFrame: Un nuevo DataFrame con una columna booleana (0 o 1) por cada
-                      palabra clave, indicando su presencia en el texto.
+        pd.DataFrame: DataFrame con las características TF-IDF.
+        TfidfVectorizer: El vectorizer utilizado (nuevo o el proporcionado).
     """
-    # Asegurarse de que la columna de texto exista y rellenar valores nulos
-    if text_column not in df.columns:
-        # Si la columna no existe (ej. en una predicción sin descripción),
-        # devolvemos un DataFrame de ceros con la estructura correcta.
-        return pd.DataFrame({f'feature_{key}': [0] * len(df) for key in KEYWORDS}, index=df.index)
-        
-    # Convertir a minúsculas y rellenar NaNs con string vacío para evitar errores
     text_series = df[text_column].str.lower().fillna('')
+
+    if vectorizer is None:
+        vectorizer = TfidfVectorizer(max_features=100, stop_words='english')
+        tfidf_matrix = vectorizer.fit_transform(text_series)
+    else:
+        tfidf_matrix = vectorizer.transform(text_series)
+
+    tfidf_df = pd.DataFrame(tfidf_matrix.toarray(), 
+                              columns=[f'tfidf_{i}' for i in range(tfidf_matrix.shape[1])], 
+                              index=df.index)
     
-    # Crear un DataFrame para las nuevas características
-    nlp_features = pd.DataFrame(index=df.index)
-    
-    # Para cada palabra clave, verificar si está presente en la descripción
-    for keyword in KEYWORDS:
-        new_column_name = f'feature_{keyword}'
-        nlp_features[new_column_name] = text_series.str.contains(keyword, regex=False).astype(int)
-        
-    return nlp_features
+    return tfidf_df, vectorizer
+
+def guardar_vectorizer(vectorizer, path):
+    """Guarda el vectorizer en un archivo pickle."""
+    with open(path, 'wb') as f:
+        pickle.dump(vectorizer, f)

@@ -4,26 +4,23 @@ Esta sección presenta un análisis profundo del mercado inmobiliario de CABA, u
 
 ## 💎 **Análisis de "Joyas Ocultas": ¿Dónde está el Valor Escondido?**
 
-Un inversor inteligente no solo busca el barrio más caro, sino el que tiene mayor potencial de revalorización. Una forma de medir esto es encontrar zonas donde el precio por metro cuadrado (`precio/m²`) aún no es prohibitivo, pero la calidad de la oferta (medida por la cantidad de `amenities`) es alta.
-
-El siguiente gráfico cruza estas dos variables:
-
-*   **Eje X:** Precio Promedio por m² (más a la derecha, más caro).
-*   **Eje Y:** % de Propiedades con Amenities (más arriba, mejor oferta).
-*   **Tamaño de la Burbuja:** Cantidad de propiedades en el barrio (más grande, más mercado).
+Un inversor inteligente no solo busca el barrio más caro, sino el que tiene mayor potencial de revalorización. El siguiente gráfico cruza el precio por metro cuadrado (`precio/m²`) con un score de amenities, que representa la cantidad promedio de comodidades (pileta, gimnasio, etc.) en las propiedades de la zona.
 
 ![Análisis de Joyas Ocultas](./images/joyas_ocultas.png)
 
-### **Interpretación y Conclusiones de Inversión:**
+**Interpretación:** Barrios como **Villa Crespo y Chacarita** se destacan como "Joyas Ocultas". Ofrecen un score de amenities competitivo, similar al de zonas más caras, pero a un precio por metro cuadrado considerablemente menor. Esto sugiere un alto potencial de valorización a medida que estos barrios continúan su desarrollo.
 
-1.  **Lujo Consolidado (Cuadrante Superior Derecho):** **Puerto Madero, Palermo y Recoleta** son los líderes indiscutibles. Tienen el precio/m² más alto y una gran oferta de amenities. Son inversiones seguras y de prestigio, pero con una barrera de entrada muy alta y, posiblemente, menor margen de crecimiento porcentual.
+---
 
-2.  **Las "Joyas Ocultas" (Cuadrante Superior Izquierdo):** Aquí es donde encontramos el valor. Barrios como **Villa Crespo, Chacarita y Colegiales** tienen un porcentaje de amenities comparable al de zonas más caras, pero su precio/m² es significativamente más bajo. 
-    *   **Insight Clave:** Estos barrios están en pleno proceso de "palermización" y gentrificación. Comprar aquí podría significar una alta revalorización a mediano plazo a medida que sus precios convergen con los de sus vecinos más cotizados.
+## 📈 **Análisis de Dispersión de Mercado: Volatilidad y Oportunidad**
 
-3.  **Mercados Tradicionales (Cuadrante Inferior Izquierdo):** Zonas como **Almagro, Caballito o Villa Urquiza** representan un mercado más tradicional. Tienen una gran cantidad de propiedades (burbujas grandes) y precios por m² más accesibles, pero una menor proporción de edificios con amenities modernos. Son ideales para una inversión conservadora o para compradores finales que buscan una buena relación precio/ubicación sin tanto lujo.
+El precio promedio no cuenta toda la historia. Un box plot nos permite visualizar la distribución de precios, la mediana y los valores atípicos, revelando la verdadera naturaleza de cada mercado local en los 6 barrios con mayor cantidad de propiedades.
 
-4.  **Zonas Emergentes (Cerca del Origen):** Barrios con bajo precio/m² y baja oferta de amenities. Podrían ser apuestas a muy largo plazo, pero con mayor riesgo.
+![Distribución de Precios por Barrio](./images/distribucion_precios_barrios.png)
+
+**Interpretación:**
+*   **Mercados Heterogéneos (Cajas Altas):** **Palermo y Recoleta** tienen un rango de precios muy amplio, indicando una gran variedad en la oferta y una mayor probabilidad de encontrar propiedades a precios competitivos.
+*   **Mercados Homogéneos (Cajas Cortas):** **Caballito y Belgrano** muestran precios más consistentes y predecibles, representando mercados más estables.
 
 ---
 

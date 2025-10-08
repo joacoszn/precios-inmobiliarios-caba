@@ -7,8 +7,7 @@ from mysql.connector.cursor import MySQLCursorDict
 import json
 import os
 
-# --- Carga de artefactos del modelo y métricas ---
-# La ruta se construye de forma relativa y robusta
+# ruta de de forma relativa y robusta
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ML_DIR = os.path.join(BASE_DIR, '..', '..', 'ml')
 METRICS_PATH = os.path.join(ML_DIR, 'metrics.json')
@@ -19,7 +18,7 @@ try:
     print("✅ Métricas del modelo cargadas exitosamente.")
 except FileNotFoundError:
     print(f"❌ Error: No se encontró el archivo de métricas en {METRICS_PATH}")
-    # Definimos métricas por defecto si el archivo no existe
+    #  métricas por defecto si el archivo no existe
     model_metrics = {"r2_score": "N/A", "rmse_usd": "N/A"}
 
 
@@ -76,7 +75,7 @@ def get_model_info():
         "model_type": type(model).__name__,
         "n_features": len(model_columns),
         "n_estimators": model.n_estimators,
-        "metrics": model_metrics, # Usamos las métricas cargadas del archivo
+        "metrics": model_metrics, 
         "top_features": feature_importance
     }
 

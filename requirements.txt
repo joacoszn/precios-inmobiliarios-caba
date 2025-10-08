@@ -11,4 +11,4 @@ jupyter
 matplotlib
 seaborn
 SQLAlchemy
-nltk
+nltkxgboost
